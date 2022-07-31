@@ -1,0 +1,56 @@
+version: "3.9"
+services:
+  mobile:
+    build:
+      context: mobile
+      dockerfile: Dockerfile
+    ports:
+      - 5037:5037
+    restart: always
+    environment:
+      API_URL: "api:8080"
+    networks: 
+      - frontnet
+    command: "flutter run"
+
+  api:
+    ports:
+    - "8080:8080"
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: always
+    depends_on: 
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/db-pic-dev?useSSL=false"
+      SPRING_DATASOURCE_USERNAME: "dev_pic"
+      SPRING_DATASOURCE_PASSWORD: "password"
+    networks:
+      - frontnet
+      - backnet
+
+  postgres:
+    image: "postgres:13.2-alpine"
+    environment:
+        POSTGRES_USER: "dev_pic"
+        POSTGRES_PASSWORD: "password"
+        POSTGRES_DB: "db-pic-dev"
+        PGDATA: /data/postgres
+    ports:
+      - "5432:5432"
+    networks: 
+      - backnet
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data:Z
+
+networks:
+  backnet:
+    driver: bridge
+  frontnet:
+    driver: bridge
+
+volumes:
+  pg_data:
+    external: true
