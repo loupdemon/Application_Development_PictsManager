@@ -1,0 +1,2 @@
+# Application_Development_PictsManager
+Epitech_MSc_Pro_Semester_8_Application_Development_PictsManager
